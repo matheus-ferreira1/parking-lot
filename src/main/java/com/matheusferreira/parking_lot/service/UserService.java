@@ -1,6 +1,8 @@
 package com.matheusferreira.parking_lot.service;
 
 import com.matheusferreira.parking_lot.entity.User;
+import com.matheusferreira.parking_lot.exception.EntityNotFoundException;
+import com.matheusferreira.parking_lot.exception.UsernameUniqueViolationException;
 import com.matheusferreira.parking_lot.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,12 +18,17 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public User getById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        return userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("User with id %d not found", id)));
     }
 
     @Transactional
     public User create(User user) {
-        return userRepository.save(user);
+        try {
+            return userRepository.save(user);
+        } catch (org.springframework.dao.DataIntegrityViolationException ex) {
+            throw new UsernameUniqueViolationException(String.format("Username %s already exists", user.getUsername()));
+        }
     }
 
     @Transactional
