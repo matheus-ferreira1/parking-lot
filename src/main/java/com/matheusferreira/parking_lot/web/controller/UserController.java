@@ -7,6 +7,7 @@ import com.matheusferreira.parking_lot.web.DTO.UserPasswordDTO;
 import com.matheusferreira.parking_lot.web.DTO.UserResponseDTO;
 import com.matheusferreira.parking_lot.web.DTO.mapper.UserMapper;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,13 +35,13 @@ public class UserController {
     }
 
     @PostMapping()
-    public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserCreateDTO userCreateDTO) {
+    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserCreateDTO userCreateDTO) {
         User newUser = userService.create(UserMapper.toUser(userCreateDTO));
         return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toDTO(newUser));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> updatePassword(@PathVariable Long id, @RequestBody UserPasswordDTO dto) {
+    public ResponseEntity<Void> updatePassword(@PathVariable Long id, @Valid @RequestBody UserPasswordDTO dto) {
         userService.updatePassword(id, dto.getCurrentPassword(), dto.getNewPassword(),
                 dto.getPasswordConfirmation());
         return ResponseEntity.noContent().build();
