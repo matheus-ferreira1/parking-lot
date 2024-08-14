@@ -2,6 +2,7 @@ package com.matheusferreira.parking_lot.service;
 
 import com.matheusferreira.parking_lot.entity.User;
 import com.matheusferreira.parking_lot.exception.EntityNotFoundException;
+import com.matheusferreira.parking_lot.exception.InvalidPasswordException;
 import com.matheusferreira.parking_lot.exception.UsernameUniqueViolationException;
 import com.matheusferreira.parking_lot.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,12 +35,12 @@ public class UserService {
     @Transactional
     public User updatePassword(Long id, String currentPassword, String newPassword, String passwordConfirmation) {
         if (!newPassword.equals(passwordConfirmation)) {
-            throw new RuntimeException("Passwords do not match");
+            throw new InvalidPasswordException("Passwords do not match");
         }
 
         User user = getById(id);
         if (!user.getPassword().equals(currentPassword)) {
-            throw new RuntimeException("Invalid credentials");
+            throw new InvalidPasswordException("Invalid credentials");
         }
 
         user.setPassword(newPassword);
