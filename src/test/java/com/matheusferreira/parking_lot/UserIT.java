@@ -1,5 +1,7 @@
 package com.matheusferreira.parking_lot;
 
+import java.util.List;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -276,5 +278,20 @@ public class UserIT {
 
         Assertions.assertThat(responseBody).isNotNull();
         Assertions.assertThat(responseBody.getStatus()).isEqualTo(400);
+    }
+
+    @Test
+    @DisplayName("Should get all users successfully")
+    public void getAllUsersSuccessfully() {
+        List<UserResponseDTO> responseBody = testClient
+                .get()
+                .uri("/api/v1/users")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(UserResponseDTO.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.size()).isEqualTo(3);
     }
 }
