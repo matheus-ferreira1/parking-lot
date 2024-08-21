@@ -126,4 +126,52 @@ public class UserIT {
         Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
     }
 
+    @Test
+    @DisplayName("Should try to create a user with an already used username")
+    public void createUserWithAlreadyUsedUsername() {
+        ErrorMessage responseBody = testClient
+                .post()
+                .uri("/api/v1/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserCreateDTO("teuzo@teste.com", "123456"))
+                .exchange()
+                .expectStatus().isEqualTo(409)
+                .expectBody(ErrorMessage.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(409);
+    }
+
+    @Test
+    @DisplayName("Should find a user by id successfully")
+    public void findUserByIdSuccessfully() {
+        UserResponseDTO responseBody = testClient
+                .get()
+                .uri("/api/v1/users/100")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(UserResponseDTO.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getId()).isEqualTo(100);
+        Assertions.assertThat(responseBody.getUsername()).isEqualTo("teuzo@teste.com");
+        Assertions.assertThat(responseBody.getRole()).isEqualTo("ADMIN");
+    }
+
+    @Test
+    @DisplayName("Should try to find a user by an invalid id")
+    public void findUserByInvalidId() {
+        ErrorMessage responseBody = testClient
+                .get()
+                .uri("/api/v1/users/999")
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody(ErrorMessage.class)
+                .returnResult().getResponseBody();
+
+        Assertions.assertThat(responseBody).isNotNull();
+        Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
+    }
 }
